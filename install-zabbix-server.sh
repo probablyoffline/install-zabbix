@@ -19,6 +19,7 @@ sudo service mysql start
 # set root password
 echo "Setting MySQL root password..."
 sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '$root_password'; FLUSH PRIVILEGES;"
+history -d $((HISTCMD-1))
 echo "MySQL root password set successfully!"
 
 # Install Zabbix repository
@@ -28,29 +29,36 @@ sudo apt-get update -y
 
 # Install Zabbix server, frontend, agent
 sudo apt-get install -y zabbix-server-mysql zabbix-frontend-php zabbix-apache-conf zabbix-sql-scripts zabbix-agent
+
+# For watching zcat progress
+sudo apt-get install -y pv
 echo "Zabbix frontend installed..."
 
 # Create initial database
+echo "Configuring database..."
 sudo mysql -uroot -p$root_password -e "create database zabbix character set utf8mb4 collate utf8mb4_bin;"
+sudo history -d $((HISTCMD-1))
 sudo mysql -uroot -p$root_password -e "create user zabbix@localhost identified by '$zabbix_password';"
+sudo history -d $((HISTCMD-1))
 sudo mysql -uroot -p$root_password -e "grant all privileges on zabbix.* to zabbix@localhost;"
+sudo history -d $((HISTCMD-1))
 sudo mysql -uroot -p$root_password -e "set global log_bin_trust_function_creators = 1;"
-sudo history -c
-echo "Password cleared from history"
+sudo history -d $((HISTCMD-1))
+echo "Passwords cleared from history"
 
 echo "Extracting database, this could take a while..."
 sudo zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -D zabbix --default-character-set=utf8mb4 -uzabbix -p$zabbix_password
+sudo history -d $((HISTCMD-1))
 sudo mysql -uroot -p$root_password -e "set global log_bin_trust_function_creators = 0;"
-sudo history -c
+sudo history -d $((HISTCMD-1))
 echo "Password cleared from history"
 
 # Configure the Zabbix server to use the database
 sudo sed -i "s/# DBPassword=.*/DBPassword=$zabbix_password/g" /etc/zabbix/zabbix_server.conf
+sudo history -d $((HISTCMD-1))
 
 sudo systemctl restart zabbix-server zabbix-agent apache2
 sudo systemctl enable zabbix-server zabbix-agent apache2
 
 # Remove the script
-sudo history -c
-history -c
 rm -- "$0"
