@@ -35,19 +35,17 @@ sudo mysql -uroot -p$root_password -e "create database zabbix character set utf8
 sudo mysql -uroot -p$root_password -e "create user zabbix@localhost identified by '$zabbix_password';"
 sudo mysql -uroot -p$root_password -e "grant all privileges on zabbix.* to zabbix@localhost;"
 sudo mysql -uroot -p$root_password -e "set global log_bin_trust_function_creators = 1;"
+sudo history -c
 
 sudo zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -D zabbix --default-character-set=utf8mb4 -uzabbix -p$zabbix_password
 sudo mysql -uroot -p$root_password -e "set global log_bin_trust_function_creators = 0;"
+sudo history -c
 
 # Configure the Zabbix server to use the database
 sudo sed -i "s/# DBPassword=.*/DBPassword=$zabbix_password/g" /etc/zabbix/zabbix_server.conf
 
 sudo systemctl restart zabbix-server zabbix-agent apache2
 sudo systemctl enable zabbix-server zabbix-agent apache2
-
-# Clear the stored password
-unset root_password
-unset zabbix_password
 
 # Remove the script
 sudo history -c
