@@ -36,10 +36,13 @@ sudo mysql -uroot -p$root_password -e "create user zabbix@localhost identified b
 sudo mysql -uroot -p$root_password -e "grant all privileges on zabbix.* to zabbix@localhost;"
 sudo mysql -uroot -p$root_password -e "set global log_bin_trust_function_creators = 1;"
 sudo history -c
+echo "Password cleared from history"
 
+echo "Extracting database, this could take a while..."
 sudo zcat /usr/share/zabbix-sql-scripts/mysql/server.sql.gz | mysql -D zabbix --default-character-set=utf8mb4 -uzabbix -p$zabbix_password
 sudo mysql -uroot -p$root_password -e "set global log_bin_trust_function_creators = 0;"
 sudo history -c
+echo "Password cleared from history"
 
 # Configure the Zabbix server to use the database
 sudo sed -i "s/# DBPassword=.*/DBPassword=$zabbix_password/g" /etc/zabbix/zabbix_server.conf
