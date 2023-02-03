@@ -97,3 +97,6 @@ sudo sed -i 's/^Alias \/zabbix/#&/' /etc/apache2/conf-available/zabbix.conf
 # Restart apache and done
 sudo systemctl restart apache2
 echo "HTTPS config complete."
+
+# Remove the script
+rm -- "$0"
