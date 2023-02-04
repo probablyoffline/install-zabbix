@@ -26,22 +26,19 @@ fi
 # backup the original host file
 cp /etc/hosts /etc/hosts.bak
 
-# use grep to find the line that contains 127.0.0.1 and $server_hostname
-echo "looking for '127.0.0.1 $server_hostname'"
-if grep -qE "^127.0.0.1.*$server_hostname" /etc/hosts; then
+# use grep to find the line that contains 127.0.0.1 or 127.0.1.1 and $server_hostname
+if grep -qE "^(127.0.0.1|127.0.1.1).*$server_hostname" /etc/hosts; then
   # if it does, check if the line is already commented out
-  if grep -qE "^#\s*127.0.0.1.*$server_hostname" /etc/hosts; then
+  if grep -qE "^#\s*(127.0.0.1|127.0.1.1).*$server_hostname" /etc/hosts; thenn
     # if it is, leave the file unchanged
     cp /etc/hosts /etc/hosts.temp
   else
     # if it's not, comment it out by adding a # symbol at the beginning of the line
-    sed -E "s/^127.0.0.1.*$server_hostname.*$/# 127.0.0.1/" /etc/hosts > /etc/hosts.temp
-    echo "127.0.0.1 hostname entry removed from host file"
+    sed -E "s/^(\(127.0.0.1\)|\(127.0.1.1\)).*$server_hostname.*$/# \1 \2 \3/" /etc/hosts > /etc/hosts.temp
   fi
 else
   # if it doesn't, leave the file unchanged
   cp /etc/hosts /etc/hosts.temp
-  echo "127.0.0.1 host file entry does not exist, skipping."
 fi
 
 # replace the original file with the modified version
