@@ -1,6 +1,6 @@
 Scripts created for lab and testing purposes. Assumes a clean environment with no existing apache servers.
 
-install-zabbix-server.sh is not secure
+install-zabbix-server.sh is not secure, temporary unencrypted 'secrets' files creates.
 
 Works as of:
 Zabbix 6.0.12 LTS
